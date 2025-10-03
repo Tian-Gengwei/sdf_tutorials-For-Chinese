@@ -119,53 +119,47 @@ if (!rootElement->HasElement("model"))
 要遍历解析后的 SDF 树，我们从根节点开始。需要注意的是，这里的```root_element```并不是 SDF 中明确给出的元素（即典型世界 SDF 文件中的 ```<world>``` 元素），而是其上一级元素。这就是为什么我们要检查模型元素的存在。  
 
 ----------------
-
-Next, you'll notice a pattern for iterating through an element children of the same type (that is, with the same tag):
-
-```c++
+接下来，你会注意到一个遍历同一类型元素子元素的模式（也就是说，具有相同标签的元素）：
+``` c++
 sdf::ElementPtr linkElement = modelElement->GetElement("link");
-while (linkElement)
-{
-    // parse link element
-    linkElement = linkElement->GetNextElement("link");
+while (linkElement){
+  // 解析链接元素 
+  linkElement = linkElement->GetNextElement("link");
 }
 ```
 
-At the beginning, we get the first link element from the model element.  If it doesn't exist, `model_element->GetElement("link")` will return a `null` pointer, and the loop will be skipped. If it does exist, we'll process that link element in the loop. We then get the next link element, but this time from the current link element instead of the model element using `link_element->GetNextElement("link")`. The latter method also returns a `null` pointer if no element could be found, so we'll eventually leave the loop when no more elements of that child remain.
+一开始，我们从模型元素中获取第一个链接元素。如果不存在， `model_element->GetElement("link")` 将返回一个 `null` 指针，并且循环将被跳过。如果存在，我们将处理该链接元素。然后我们获取下一个链接元素，但这次使用 `link_element->GetNextElement("link")` 从当前链接元素获取，而不是从模型元素获取。后一种方法如果没有找到元素也会返回一个 `null` 指针，因此当没有更多该子元素时，我们最终会退出循环。
 
-To summarize, while `GetElement()` retrieves *child* elements, `GetNextElement()` retrieves *sibling* elements. With that in mind, you'll find the iterations over links, joints, collisions, etc., quite straightforward and easy to grasp.
 
-----------------------
-Let's now focus on the joints elements' iteration:
+总而言之， `GetElement()` 用于检索子(*child*)元素，而 `GetNextElement()` 用于检索同级(*sibling*)元素。有了这个前提，你会发现对链接、关节、碰撞等的迭代会非常直观且易于理解。
+
+现在让我们专注于关节元素的迭代：
 
 ```c++
 const std::string jointName = jointElement->Get<std::string>("name");
 std::cout << "Found " << jointName << " joint in "
           << modelName << " model!" << std::endl;
-
 const sdf::ElementPtr parentElement = jointElement->GetElement("parent");
 const std::string parentLinkName = parentElement->Get<std::string>();
-
 const sdf::ElementPtr childElement = jointElement->GetElement("child");
 const std::string childLinkName = childElement->Get<std::string>();
-
 std::cout << "Joint " << jointName << " connects " << parentLinkName
-          << " link to " << childLinkName << " link" << std::endl;
-
+          << " link to " << childLinkName << " link" << std::endl; 
 ```
 
-As you might guess, we're getting the `name` attribute of the current `joint_element` and then retrieving its `parent` and `child` elements' values. It is interesting to note all `Get()` method's use cases: `Get()` is a template method that returns the given attribute value or the element value itself (that is, the plain text in between tags) if called with no arguments. To this end, it has been specialized to parse such value accordingly into primitive types (i.e. `double`), common std types (i.e. `std::string`) or [`ignition::math`](http://gazebosim.org/libraries/math) types for the most complex ones (like poses).
+正如你所猜到的，我们正在获取当前 `joint_element` 的 `name` 属性，然后检索其 `parent` 和 `child` 元素的值。值得注意的是 `Get()` 方法的所有使用场景： `Get()` 是一个模板方法，如果没有参数调用，它会返回给定的属性值或元素值本身（即标签之间的纯文本）。为此，它已被专门用于将此类值相应地解析为原始类型（即 `double` ）、常见 std 类型（即 `std::string` ）或 [`ignition::math`](http://gazebosim.org/libraries/math)  类型，用于最复杂的情况（如姿势）。
 
-### Building the code
+### 构建代码
 
-Create an empty directory:
+创建一个空目录：
 
 ```sh
 mkdir sdf_tutorial
 cd sdf_tutorial
 ```
 
-Copy the code into a file and name it `check_sdf.cc`. Along with it, add a `CMakeLists.txt` file and copy the following into it:
+
+将代码复制到一个文件中并命名为 `check_sdf.cc` 。同时，添加一个 `CMakeLists.txt` 文件并将以下内容复制到其中：
 
 ```
 cmake_minimum_required(VERSION 2.8 FATAL_ERROR)
@@ -177,12 +171,12 @@ include_directories(${SDFormat_INCLUDE_DIRS})
 link_directories(${SDFormat_LIBRARY_DIRS})
 
 add_executable(check_sdf check_sdf.cc)
-target_link_libraries(check_sdf ${SDFormat_LIBRARIES})
+target_link_libraries(check_sdf ${SDFormat_LIBRARIES}) 
 ```
 
-**Note**: If you are using a higher version than 6 you should use to find the library `find_package(sdformat<version of sdformat> REQUIRED)`
+**注意**：如果你使用的版本高于 6 ，你应该使用 `find_package(sdformat<version of sdformat> REQUIRED)` 来查找库
 
-Now build it:
+现在构建它：
 
 ```sh
 mkdir build
@@ -191,7 +185,7 @@ cmake ..
 make
 ```
 
-You can find plenty of SDF samples to play with [here](http://models.gazebosim.org/). Just fetch the `model.sdf` of your model of choice and give it a more meaningful name. For example, running `./check_sdf` on the `husky.sdf` file (`husky/model.sdf` on the site) will generate the following output:
+你可以在[这里](http://models.gazebosim.org/)找到许多 SDF 示例进行操作。只需获取你选择的模型的 `model.sdf` ，并给它一个更有意义的名称。例如，在 `husky.sdf` 文件（网站上的 `husky/model.sdf` ）上运行 `./check_sdf` 将生成以下输出：
 
 ```
 Found husky model!
