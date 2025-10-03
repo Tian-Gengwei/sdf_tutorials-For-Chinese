@@ -7,4 +7,4 @@
 >请将这些内容提交到 [`sdformat`](https://github.com/osrf/sdformat/) 仓库。 
 >
 > 如果您确定此问题属于 [`sdf_tutorials`](https://github.com/osrf/sdf_tutorials/)，请删除此文本，并用您的问题替换它在[主分支](github.com/osrf/sdf_tutorials.)的原本。
->
+>当然，该分支保留了原模板，以方便各位使用
