@@ -1,88 +1,87 @@
-# SDF Quickstart Guide
+# SDF快速入门指南
 
-This guide will walk you through sdformat's [API](http://sdformat.org/api), showing you the basics on how to use it to parse your SDFs. You'll find the API quite regular, making it very easy to pick up.
+本指南将引导您了解 sdformat 的 [API](http://sdformat.org/api) , 向您展示如何使用它来解析您的SDF文件，您会发现该API非常规范而易于掌握。
 
-## Prerequisites
+## 前置条件
 
-Make sure you have [sdformat](/tutorials?tut=install) installed on your system.
+确保 [sdformat](/tutorials?tut=install) 已经安装到你的系统中.
 
-## Parsing a model SDF
+## 解析模型SDF
 
-### Developing the code
+### 开发代码
 
-Consider the code below:
+考虑下面的代码（C++ , 增加了部分注释）:
 
 ```c++
 #include <iostream>
 
-#include <sdf/sdf.hh>
-
-int main(int argc, const char* argv[])
+#include <sdf/sdf.hh> //-引入sdf头文件-
+int main(int argc, const char* argv[])  //-主函数-
 {
-  // check arguments
+  // 参数检查
   if (argc < 2)
   {
-    std::cerr << "Usage: " << argv[0]
-              << " <sdf-path>" << std::endl;
+    std::cerr << "使用: " << argv[0] 
+              << " <sdf路径>" << std::endl;  //-输出信息：路径-
     return -1;
   }
-  const std::string sdfPath(argv[1]);
+  const std::string sdfPath(argv[1]);  //-定义SDF文件路径-
 
-  // load and check sdf file
-  sdf::SDFPtr sdfElement(new sdf::SDF());
-  sdf::init(sdfElement);
-  if (!sdf::readFile(sdfPath, sdfElement))
+  //加载并检查SDF文件
+  sdf::SDFPtr sdfElement(new sdf::SDF()); //-创建SDF对象-
+  sdf::init(sdfElement);  //-初始化sdformat-
+  if (!sdf::readFile(sdfPath, sdfElement)) // -读取SDF文件-
   {
-    std::cerr << sdfPath << " is not a valid SDF file!" << std::endl;
+    std::cerr << sdfPath << " 不是一个有效的SDF文件！" << std::endl; //-输出错误信息：非有效文件-
     return -2;
   }
 
-  // start parsing model
-  const sdf::ElementPtr rootElement = sdfElement->Root();
-  if (!rootElement->HasElement("model"))
+  // 开始解析模型
+  const sdf::ElementPtr rootElement = sdfElement->Root(); //-获取根元素-
+  if (!rootElement->HasElement("model")) // -检查模型文件-
   {
-    std::cerr << sdfPath << " is not a model SDF file!" << std::endl;
+    std::cerr << sdfPath << " 不是一个SDF模型文件！" << std::endl; //-输出错误信息：非模型文件-
     return -3;
   }
-  const sdf::ElementPtr modelElement = rootElement->GetElement("model");
-  const std::string modelName = modelElement->Get<std::string>("name");
-  std::cout << "Found " << modelName << " model!" << std::endl;
+  const sdf::ElementPtr modelElement = rootElement->GetElement ("model"); //-获取模型元素-
+  const std::string modelName = modelElement->Get<std::string>("name"); //-获取模型名称-
+  std::cout << "发现" << modelName << " 模型!" << std::endl; //-输出信息：模型名称-
 
-  // parse model links
-  sdf::ElementPtr linkElement = modelElement->GetElement("link");
-  while (linkElement)
+  // 解析模型链接
+  sdf::ElementPtr linkElement = modelElement->GetElement("link"); //-获取模型链接-
+  while (linkElement) // -循环遍历链接-
   {
-    const std::string linkName = linkElement->Get<std::string>("name");
-    std::cout << "Found " << linkName << " link in "
-              << modelName << " model!" << std::endl;
-    linkElement = linkElement->GetNextElement("link");
+    const std::string linkName = linkElement->Get<std::string>("name"); //-获取链接名称-
+    std::cout << " 发现 " << linkName << " 链接在 " // -输出信息：链接名称-
+              << modelName << " 模型中!" << std::endl;
+    linkElement = linkElement->GetNextElement("link"); //-获取下一个模型链接-
   }
 
-  // parse model joints
-  sdf::ElementPtr jointElement = modelElement->GetElement("joint");
-  while (jointElement)
+  // 解析模型接头
+  sdf::ElementPtr jointElement = modelElement->GetElement("joint"); //-获取模型接头-
+  while (jointElement) // -循环遍历接头-
   {
-    const std::string jointName = jointElement->Get<std::string>("name");
-    std::cout << "Found " << jointName << " joint in "
-              << modelName << " model!" << std::endl;
+    const std::string jointName = jointElement->Get<std::string>("name"); //-获取接头名称-
+    std::cout << "Found " << jointName << " joint in " // -输出信息：接头名称-
+              << modelName << " model!" << std::endl; // -输出信息：模型名称-
 
-    const sdf::ElementPtr parentElement = jointElement->GetElement("parent");
-    const std::string parentLinkName = parentElement->Get<std::string>();
+    const sdf::ElementPtr parentElement = jointElement->GetElement("parent"); //-获取模型接头父级元素-
+    const std::string parentLinkName = parentElement->Get<std::string>(); //  -获取链接父级名称-
 
-    const sdf::ElementPtr childElement = jointElement->GetElement("child");
-    const std::string childLinkName = childElement->Get<std::string>();
+    const sdf::ElementPtr childElement = jointElement->GetElement("child"); //-获取模型接头子级元素-
+    const std::string childLinkName = childElement->Get<std::string>(); //-获取链接子级名称-
 
-    std::cout << "Joint " << jointName << " connects " << parentLinkName
-              << " link to " << childLinkName << " link" << std::endl;
+    std::cout << "接头" << jointName << " 承接 " << parentLinkName
+              << "连接到" << childLinkName << " 链接link" << std::endl; //-输出信息：接头名称，链接父级名称，链接子级名称-
 
-    jointElement = jointElement->GetNextElement("joint");
+    jointElement = jointElement->GetNextElement("joint"); //-获取下一个模型接头-
   }
 
   return 0;
 }
 ```
 
-Let's break it down a bit.
+让我们来把它拆解一下.
 
 ----------------
 
@@ -91,7 +90,8 @@ sdf::SDFPtr sdfElement(new sdf::SDF());
 sdf::init(sdfElement);
 ```
 
-This is the main entrypoint to the API: any SDF tree, either in a file  or as a string, will be parsed into this object. On calling `sdf::init()`, the XML schemas for all SDF versions are loaded in order to provide format validation later on.
+这是API的主要入口：任何SDF树，无论是在文件中还是字符串形式，都将被解析为这个对象。在调用```sdf::init()```时，将加载所有SDF版本的XML模式，以便稍后进行格式验证。
+
 
 ----------------
 
@@ -103,7 +103,7 @@ if (!sdf::readFile(sdfPath, sdfElement))
 }
 ```
 
-Given an `sdf_path` , `sdf::readFile` will attempt to parse such file into our `sdf_element`. If it fails to do so, either because the file could not be accessed or it was not a valid SDF or URDF (yes, sdformat handles both formats seamlessly!), it will return `false` .
+给定一个```sdf_path```，```sdf::readFile```将尝试将此文件解析为我们的```sdf_element``` 。如果它无法这样做，无论是由于文件无法访问，或者它不是一个有效的 SDF 或 URDF（是的，sdformat 可以无缝处理这两种格式！），它将返回```false```。
 
 ----------------
 
@@ -116,7 +116,7 @@ if (!rootElement->HasElement("model"))
 }
 ```
 
-To traverse the parsed SDF tree, we start at the root. It is important to note that the `root_element` here is **not** the same element as the one given explicitly on the SDF (i.e. the a `<world>` element on a typical world SDF file) but one above. That's why we check for model element existence.  
+要遍历解析后的 SDF 树，我们从根节点开始。需要注意的是，这里的```root_element```并不是 SDF 中明确给出的元素（即典型世界 SDF 文件中的 ```<world>``` 元素），而是其上一级元素。这就是为什么我们要检查模型元素的存在。  
 
 ----------------
 
