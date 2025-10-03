@@ -1,28 +1,25 @@
-# Creating Worlds in SDFormat
+# 在sdformat中创建世界
 
-Conceptually, a world in SDFormat is a environment in which models can be
-instantiated and simulated by a physics engine. A world is created using the
-`<world>` tag. It can contain various elements, but this documentation only covers the
-`<model>` element as we describe how to create a simulation world
-composed of various models. The full specification of `<world>` can be found
-[here](http://sdformat.org/spec?ver=1.4&elem=world).
+从概念上讲，SDFormat 中的世界是一个环境，物理引擎可以在其中实例化和模拟模型。 世界使用
+`<world>`标签创建。它可以包含各种元素，但是此文档仅涵盖`<model>`，因为我们描述如何创建由各种模型组成的模拟世界。完整的规格`<world>`可以在[这里](http://sdformat.org/spec?ver=1.4&elem=world).找到
 
-> **Note**: See [Appendix](#appendix) about a required name attribute of `<world>`
 
-One of the most fundamental properties of a world is that it contains the world
-coordinate frame, which is defined to be the canonical inertial frame of
-reference for all dynamic bodies in the world. When a model is inserted into
-a world as a direct child of `<world>`, its pose is expressed relative to this
-frame. Refer to the [Specifying Pose](/tutorials?tut=specify_pose) and [Model
-Kinematics](/tutorials?tut=spec_model_kinematics) documentation to learn more
-about setting poses of models.
+> **注意**：关于`<world>`所需的名称（*name*）属性请参阅[附录](#appendix)
 
-Two methods are available in SDFormat for inserting a model into a world.
+世界上最基本的特性之一是它包含世界
+坐标框架，被定义为规范的惯性框架
+参考世界上所有动态机构。当模型插入
+一个直接孩子的世界`<world>`，其姿势相对于此表示
+框架。参考[Specifying Pose](/tutorials?tut=specify_pose)和[模型
+运动学]（/教程？tut = spec_model_kinematics）文档以了解更多信息
+关于设置模型的姿势。
 
-## Models defined inline
+SDFormat中有两种方法可将模型插入世界。
 
-The first method involves defining the models directly inside the `<world>`
-tag. Example:
+## 模型定义了内联
+
+第一种方法涉及直接定义模型`<world>`
+标签。例子：
 
 ```xml
 <?xml version="1.0" ?>
@@ -48,19 +45,19 @@ tag. Example:
   </world>
 </sdf>
 ```
-This is the simplest approach since it only requires a single file to describe
-the world. However, it has some drawbacks.
+这是最简单的方法，因为它仅需要一个文件来描述
+世界。但是，它有一些缺点。
 
-1. If multiple instances of the same model but at different poses are desired,
-   the entire text of the `<model>` tag has to be duplicated.
-1. Models defined in a world file cannot be used in other worlds or other SDF
-   files.
+1. 如果需要相同模型但需要不同姿势的多个实例，
+整个文本`<model>`标签必须重复。
+1. 世界文件中定义的模型不能在其他世界或其他SDF中使用
+文件。
 
-## Models defined in other files
+## 其他文件中定义的模型
 
-To mitigate these issues SDFormat v1.4 introduced the `<include>` tag inside
-`<world>`. With this approach, models can be defined in separate files and
-later get inserted into a world by using the `<include>` tag. Example:
+为了减轻这些问题，sdformat v1.4引入了`<include>`在里面标记
+`<world>`。使用这种方法，可以在单独的文件和
+后来通过使用`<include>`标签。例子：
 
 ```xml
 <!--ground/ground.sdf-->
@@ -145,17 +142,17 @@ later get inserted into a world by using the `<include>` tag. Example:
 </sdf>
 ```
 
-As can be seen in the example, the models `ground`, `box`, and `sphere` are
-defined in the files `ground/ground.sdf`, `box/box.sdf`, and
-`sphere/sphere.sdf` respectively along with their `model.config` files. In
-`simple_world.sdf` the `<include>` tag is used to include the models in the
-world. The pose of each model can be overridden by the `<pose>` child tag of
-`<include>`. This is demonstrated in the example where the pose of the sphere
-in the original definition of the model was `1 2 3 0 0 0` but gets overridden
-to `10 0 2 0 0 0` when inserted into the world. Since the name of a model has
-to be unique, `<include>` also provides a mechanism for overriding the name of
-the included model. Thus, it is possible to create two instances of the same
-model with different names as shown in the following example.
+如示例可以看出的模型`ground`, `box`， 和`sphere`是
+在文件中定义`ground/ground.sdf`, `box/box.sdf`， 和
+`sphere/sphere.sdf`分别与他们`model.config`文件。在
+`simple_world.sdf`这`<include>`标签用于将模型包括在
+世界。每个模型的姿势都可以被`<pose>`儿童标签
+`<include>`。这在示例中证明了这一点
+在模型的原始定义中是`1 2 3 0 0 0`但是被覆盖了
+到`10 0 2 0 0 0`当插入世界时。由于模型的名称具有
+独特，`<include>`还提供了覆盖名称的机制
+随附的模型。因此，可以创建两个相同的实例
+具有不同名称的模型，如下示例所示。
 
 ```xml
 <?xml version="1.0" ?>
@@ -174,19 +171,19 @@ model with different names as shown in the following example.
 </sdf>
 ```
 
-> **Note**: A functionally limited version of the `<include>` tag is available
-> in SDFormat v1.4. This version allows specifying the `<uri>` of the
-> externally defined model but does not allow overriding the name or pose of
-> the inserted model.
+> **注意**：功能上有限的版本`<include>`标签可用
+> 在SDFORMAT v1.4中。此版本允许指定`<uri>`的
+> 外部定义的模型，但不允许覆盖名称或姿势
+> 插入的模型。
 
-## Creating a box and a sphere on ground plane
+## 在地面上创建一个盒子和一个球
 
-A fully working example of a box and a sphere placed on a ground plane is
-provided below. Note that the `<static>` tag is used in the ground model to
-indicate that the model does not behave as a dynamic object and should be
-considered only for its collision and visual properties. More about the
-`<static>` tag can be found in the [Inertial
-Properties](/tutorials?tut=spec_inertial) documentation (coming soon).
+一个盒子的完全工作示例和放置在地面上的球体是
+下面提供。请注意`<static>`在地面模型中使用标签
+表明该模型不作为动态对象，应该是
+仅考虑其碰撞和视觉特性。更多关于
+`<static>`标签可以在[惯性
+属性]（/tutorials？tut = spec_inertial）文档（即将推出）。
 
 ```xml
 <?xml version="1.0" ?>
@@ -256,17 +253,17 @@ Properties](/tutorials?tut=spec_inertial) documentation (coming soon).
 </sdf>
 ```
 
-## Appendix
+## 附录
 
-The `<world>` tag has a required `name` attribute. It can be used to
-differentiate between multiple worlds running in parallel. However, this is not
-a very common use case and will not be discussed in this article.
+这`<world>`标签有一个必需的`name`属性。它可以习惯
+区分并行运行的多个世界。但是，这不是
+一个非常常见的用例，将在本文中讨论。
 
-The world element is not referred to elsewhere in an SDF file by the name
-specified in its `name` attribute. Instead, the special name `world` is used.
-For example, when referring to the world as a link in the `<joint>` element,
-the special name `world` refers to the world as long as there is no sibling link
-that has the name `world`.
+世界元素未通过名称中的SDF文件中的其他位置提及
+在其中指定`name`属性。相反，特殊名称`world`使用。
+例如，将世界称为链接时`<joint>`元素，
+特殊名称`world`只要没有兄弟姐妹链接，就指世界
+有名字`world`.
 
 ```xml
 <sdf version="1.4">
