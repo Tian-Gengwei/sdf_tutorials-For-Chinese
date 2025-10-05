@@ -47,9 +47,7 @@ SDFormat中有两种方法可将模型插入世界。
 
 ## 其他文件中定义的模型
 
-为了减轻这些问题，sdformat v1.4引入了`<include>`在里面标记
-`<world>`。使用这种方法，可以在单独的文件和
-后来通过使用`<include>`标签。例子：
+为了减轻这些问题，sdformat v1.4引入了在`<world>`内部使用`<include>`标签的方法。使用这种方法，模型可以定义在在单独的文件中，并可在稍后通过使用`<include>`标签插入到`world`中。例如：
 
 ```xml
 <!--ground/ground.sdf-->
@@ -134,17 +132,7 @@ SDFormat中有两种方法可将模型插入世界。
 </sdf>
 ```
 
-如示例可以看出的模型`ground`, `box`， 和`sphere`是
-在文件中定义`ground/ground.sdf`, `box/box.sdf`， 和
-`sphere/sphere.sdf`分别与他们`model.config`文件。在
-`simple_world.sdf`这`<include>`标签用于将模型包括在
-世界。每个模型的姿势都可以被`<pose>`儿童标签
-`<include>`。这在示例中证明了这一点
-在模型的原始定义中是`1 2 3 0 0 0`但是被覆盖了
-到`10 0 2 0 0 0`当插入世界时。由于模型的名称具有
-独特，`<include>`还提供了覆盖名称的机制
-随附的模型。因此，可以创建两个相同的实例
-具有不同名称的模型，如下示例所示。
+如示例所示，模型 `ground` 、 `box` 和 `sphere` 分别在文件 `ground/ground.sdf` 、 `box/box.sdf` 和 `sphere/sphere.sdf` 中定义，并包含其 `model.config` 文件。在 `simple_world.sdf` 中使用 `<include>` 标签将模型包含到世界中。每个模型的姿态可以通过 `<include>` 的 `<pose>` 子标签进行覆盖。示例中展示了这一点：模型原始定义中的球体姿态为 `1 2 3 0 0 0` ，但在插入世界时被覆盖为 `10 0 2 0 0 0` 。由于模型名称必须唯一， `<include>` 也提供了覆盖包含模型名称的机制。因此，可以创建具有不同名称的相同模型的两个实例，如下例所示。 
 
 ```xml
 <?xml version="1.0" ?>
@@ -163,10 +151,7 @@ SDFormat中有两种方法可将模型插入世界。
 </sdf>
 ```
 
-> **注意**：功能上有限的版本`<include>`标签可用
-> 在SDFORMAT v1.4中。此版本允许指定`<uri>`的
-> 外部定义的模型，但不允许覆盖名称或姿势
-> 插入的模型。
+> **注意**：在SDFORMAT v1.4中，功能受限(*functionally limited*)版本的`<include>`标签可用。此版本允许指定外部定义模型的`<uri>`，但不允许覆盖名称或姿势插入的模型。
 
 ## 在地面上创建一个盒子和一个球
 
